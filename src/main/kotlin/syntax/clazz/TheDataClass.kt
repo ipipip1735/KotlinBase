@@ -30,6 +30,12 @@ fun main() {
     //自动生成component1~n()方法
 //    println("tdc3.name = ${tdc3.component1()}, tdc3.id = ${tdc3.component2()}")// 10
 
+    //分解数据类
+    val (a, b) = TheDataClass("zero", 0)
+    println("a = ${a}, b = ${b}")
+
+
+
 
     //数据类继承普通类
 //    val sub :SubODC = SubODC("one", 11)
@@ -43,14 +49,14 @@ fun main() {
 
 
     //标准库内置数据类
-    val p : Pair<String, Int> = Pair("one", 111)
-    println("p = ${p}")
-    println("p.toList() = ${p.toList()}")
-    val k = p to 11
-    println("k = ${k}")
-    val t:Triple<String, Int, Float> = Triple("one", 22, 3.33f)
-    println("t = ${t}")
-    println("t = ${t.toList()}")
+//    val p : Pair<String, Int> = Pair("one", 111)
+//    println("p = ${p}")
+//    println("p.toList() = ${p.toList()}")
+//    val k = p to 11
+//    println("k = ${k}")
+//    val t:Triple<String, Int, Float> = Triple("one", 22, 3.33f)
+//    println("t = ${t}")
+//    println("t = ${t.toList()}")
 
 
 }
