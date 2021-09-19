@@ -1,4 +1,6 @@
 import jvm.ktInterfaces;
+import syntax.clazz.CCO;
+import syntax.clazz.CompanionClass;
 
 /**
  * Created by Administrator on 2021/7/28.
@@ -9,7 +11,14 @@ public class CallKT {
 //        callKtObject();//调用Kt对象
 //        callKtFun();//调用Kt函数
 //        callKtFunWithParms();//调用Kt函数（带默认参数）
-        callKtInterface();//调用Kt接口
+//        callKtInterface();//调用Kt接口
+        callCompanion();//调用伴随对象
+
+    }
+
+    private static void callCompanion() {
+        CompanionClass.show(new CCO(11));//访问伴随对象中的扩展函数
+        CompanionClass.A.one();
     }
 
 

@@ -3,7 +3,19 @@ package syntax.clazz
 /**
  * Created by Administrator on 2021/6/13.
  */
-data class TheDataClass(var name:String, var id:Int)//定义数据对象
+data class TheDataClass(var name:String, var id:Int)
+
+data class OneDataClass(val name:String){
+    init {
+        val k:Int = 1
+    }
+}
+data class TwoDataClass(val map:Map<String, Any?>){
+    //只有主构造函数中的map参与toString()、equals()、hashCode()、copy()，下面的代理属性不能享受数据对象代理的便利
+    val name:String by map
+    val id: Int by map
+    val age:Int by map
+}
 
 /**
  * 数据类继承普通类
@@ -31,10 +43,14 @@ fun main() {
 //    println("tdc3.name = ${tdc3.component1()}, tdc3.id = ${tdc3.component2()}")// 10
 
     //分解数据类
-    val (a, b) = TheDataClass("zero", 0)
-    println("a = ${a}, b = ${b}")
+//    val (a, b) = TheDataClass("zero", 0)
+//    println("a = ${a}, b = ${b}")
 
 
+    //使用
+//    val one = OneDataClass("Bob")
+//    val two = one.copy("Jack")
+//    println("one = ${one}, two = ${two}")
 
 
     //数据类继承普通类
@@ -57,6 +73,17 @@ fun main() {
 //    val t:Triple<String, Int, Float> = Triple("one", 22, 3.33f)
 //    println("t = ${t}")
 //    println("t = ${t.toList()}")
+
+
+    //数据对象使用属性代理
+    val (n, a) = TheDataClass("Bob", 12)
+
+    val two:TwoDataClass = TwoDataClass(mapOf("name" to "Bob", "age" to 11, "id" to 999))
+    println("two = ${two}")
+    val (m) = two
+
+
+
 
 
 }

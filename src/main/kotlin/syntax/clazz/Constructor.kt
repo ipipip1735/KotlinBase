@@ -38,25 +38,28 @@ fun main() {
 //    println("dd.i = ${dd.i}")
 
 
-
 //    var ff:FF = FF()
 //    ff.d()
 }
 
-class OneConstructor(val age: Int,){
+class OneConstructor(val age: Int, ) {
+
     init {
         println("~~init1~~")
         println("age = ${age}")
     }
+
     init {
         println("~~init2~~")
         println("age = ${age}")
     }
-    constructor(n: Int, id: Long): this(n){
+
+    constructor(n: Int, id: Long) : this(n) {
         println("~~constructor1~")
         println("n = [${n}], id = [${id}]")
     }
-    constructor(name: String, n: Int, id: Long): this(n, id){
+
+    constructor(name: String, n: Int, id: Long) : this(n, id) {
         println("~~constructor2~")
         println("name = [${name}], n = [${n}], id = [${id}]")
     }
@@ -108,14 +111,15 @@ class EE() {
         const val INT = 1
         fun aa() = INT
     }
+
     var ff: FF = FF()
-    fun check(){
+    fun check() {
 
     }
 }
 
 class FF() {
-    lateinit var ss:String
+    lateinit var ss: String
     fun d() {
         println("isInitialized is " + this::ss.isInitialized)
     }

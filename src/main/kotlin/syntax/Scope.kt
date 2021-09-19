@@ -3,21 +3,40 @@ package syntax
 /**
  * Created by Administrator on 2021/6/13.
  */
-class scopeTrial {
-}
-
-fun sd(s: String?) {
-    with(s) {
-//        println("$length")
-    }
-}
-
 fun main() {
-//    null?.
-//    "ok"?.
-//    let{
-//        println("it = ${it}")
-//    }
+    val one = OneSF()
+    one.show()
 
-//    sd(null)
+    one.apply {
+        println("this = ${this}")
+    }
+    one.run {
+        println("this = ${this}")
+    }
+
+    one.let {
+        println("it = ${it}")
+    }
+
+    one.also {
+        println("it = ${it}")
+    }
+
+    one.takeIf {
+        println("it = ${it}")
+        true
+    }
+
+    one.takeUnless {
+        println("it = ${it}")
+        true
+    }
+
+
+}
+
+class OneSF(var name: String = "Bob") {
+    fun show() = apply {
+        println("this = ${this}")
+    }
 }

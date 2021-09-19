@@ -11,19 +11,19 @@ import kotlin.coroutines.EmptyCoroutineContext
 /**
  * 任务链
  */
-//fun main() = runBlocking {
-//    println("coroutineContext = ${coroutineContext}")
-//
-//    val job = launch {
-//        println("coroutineContext = ${coroutineContext}")
-//        println("coroutineContext.job.count() = ${coroutineContext.job.children.count()}")
-//        launch {
-//            println("coroutineContext = ${coroutineContext}")
-//        }
-//        println("coroutineContext.job.count() = ${coroutineContext.job.children.count()}")
-//    }
-//    println("coroutineContext.job.count() = ${coroutineContext.job.children.count()}")
-//}
+fun main() = runBlocking {
+    println("coroutineContext = ${coroutineContext}")
+
+    val job = launch {
+        println("Job|coroutineContext = ${coroutineContext}")
+        println("Job|coroutineContext.job.count() = ${coroutineContext.job.children.count()}")
+        launch {
+            println("SubJob|coroutineContext = ${coroutineContext}")
+        }
+        println("Job|coroutineContext.job.count() = ${coroutineContext.job.children.count()}")
+    }
+    println("coroutineContext.job.count() = ${coroutineContext.job.children.count()}")
+}
 
 
 /**
@@ -48,19 +48,19 @@ import kotlin.coroutines.EmptyCoroutineContext
 /**
  * 切换上下文
  */
-fun main() = runBlocking {
-    println("coroutineContext = ${coroutineContext}|${java.lang.Thread.currentThread()}")
-
-    launch {
-        println("start|coroutineContext = ${coroutineContext}|${java.lang.Thread.currentThread()}")
-        withContext(coroutineContext) {
-            println("withContext|coroutineContext = ${coroutineContext}|${java.lang.Thread.currentThread()}")
-        }
-        println("end|coroutineContext = ${coroutineContext}|${java.lang.Thread.currentThread()}")
-
-    }
-    println("coroutineContext.job.count() = ${coroutineContext.job.children.count()}|${java.lang.Thread.currentThread()}")
-}
+//fun main() = runBlocking {
+//    println("coroutineContext = ${coroutineContext}|${java.lang.Thread.currentThread()}")
+//
+//    launch {
+//        println("start|coroutineContext = ${coroutineContext}|${java.lang.Thread.currentThread()}")
+//        withContext(coroutineContext) {
+//            println("withContext|coroutineContext = ${coroutineContext}|${java.lang.Thread.currentThread()}")
+//        }
+//        println("end|coroutineContext = ${coroutineContext}|${java.lang.Thread.currentThread()}")
+//
+//    }
+//    println("coroutineContext.job.count() = ${coroutineContext.job.children.count()}|${java.lang.Thread.currentThread()}")
+//}
 
 /**
  * 更改Job

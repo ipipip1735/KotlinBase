@@ -1,11 +1,14 @@
 package syntax.clazz
 
+import syntax.clazz.CompanionClass.A.show
+
 /**
  * Created by Administrator on 2021/6/13.
  */
 fun main() {
 
-    //抽象类
+    //内部类
+//    inner()
 
 
     //匿名类
@@ -16,6 +19,8 @@ fun main() {
 
     //伴随对象
 //    CompanionClass.one()
+//    CCO().show()//调用伴随对象中定义的扩展函数
+
 
     //扩展函数
 //    var oneTC: OneTC = OneTC()
@@ -40,9 +45,9 @@ fun main() {
 //    twoInherit.show()
 
     //内联类
-//    val oneIC: OneIC = OneIC("abcdefg")
-//    println("oneIC.s = ${oneIC.s}, oneIC.size = ${oneIC.size}")
-//    show(oneIC)
+    val oneIC: OneIC = OneIC("abcdefg")
+    println("oneIC.s = ${oneIC.s}, oneIC.size = ${oneIC.size}")
+    show(oneIC)
 
 
     //内联类VS类型别名
@@ -56,6 +61,14 @@ fun main() {
 //    // And vice versa:
 //    acceptNameTypeAlias(string) // OK: pass underlying type instead of alias
 ////    acceptNameInlineClass(string) // Not OK: can't pass underlying type instead of inline class
+}
+
+fun inner() {
+    val outer: Outer = Outer()
+    val inner: Outer.Inner = Outer().Inner()
+    println("outer = ${outer}")
+    println("inner = ${inner}")
+
 }
 
 private fun staticOne() {
@@ -87,9 +100,16 @@ class CompanionClass {
         fun one() {
             println("one")
         }
+
+        //扩展函数
+        @JvmStatic
+        fun CCO.show() {
+            println(this)
+        }
     }
 }
 
+class CCO(val id: Int = 1)
 
 open class OneTC {
     var i: Int = 0
@@ -138,6 +158,14 @@ class TwoInherit : OneInherit() {
     override fun show() {
         println("~~TwoInherit.show()~~")
         println("k = ${k}")
+    }
+}
+
+/**
+ * 内部类
+ */
+class Outer {
+    inner class Inner {
     }
 }
 
