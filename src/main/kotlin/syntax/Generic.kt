@@ -7,14 +7,39 @@ fun main() {
     //扩展函数泛型
 //    extenerFun()
 
-    //变体
-    var zeroGI: ZeroGI<TwoG>
-    zeroGI = OneZG()//逆变
-    zeroGI.show(OneG())
+    //变体（方式一）
+//    var zeroGI: ZeroGI<TwoG>
+//    zeroGI = OneZG()//逆变
+//    zeroGI.show(OneG())
 
 //    var zeroGO: ZeroGO<ThreeG>
 //    zeroGO = FourZG()//协变
 //    zeroGO.see()
+
+    //变体（方式二）
+//    var k1: ZeroGI<OneG> = object : ZeroGI<OneG> {
+//        override fun show(t: OneG) {
+//        }
+//    }
+//    var k2: ZeroGI<TwoG> = object : ZeroGI<TwoG> {
+//        override fun show(t: TwoG) {
+//        }
+//
+//    }
+//    k2 = k1 //逆变
+
+    var k1: VoidGI<OneG> = object : VoidGI<OneG> {
+        override fun result(): OneG {
+            return OneG()
+        }
+    }
+    var k2: VoidGI<TwoG> = object : VoidGI<TwoG> {
+        override fun result(): TwoG {
+            return TwoG()
+        }
+    }
+    k1 = k2 //协变
+
 
 
     //投影
@@ -68,6 +93,10 @@ open class OneG
 class TwoG : OneG()
 interface ZeroGI<in T> {
     fun show(t: T)
+}
+
+interface VoidGI<out T> {
+    fun result(): T
 }
 
 class OneZG : ZeroGI<OneG> {
