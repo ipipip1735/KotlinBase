@@ -20,7 +20,7 @@ fun main() {
 //    if (k is Float) println("float|k is $k")
 
     //使用Lambda表达式实现函数式接口
-//    lambda()
+    lambda()
 
 
     //递归函数
@@ -28,22 +28,27 @@ fun main() {
 
 
     //内联函数
-    println("start")
-    inlinefun()
-    println("end")
+//    println("start")
+//    inlinefun()
+//    println("end")
 
 
     //实例化参数
 //    sevenIF<String>(String::class)
 //    eightIF<String>()
+
+    //扩展函数
+//    ExtexndFunOne(23).see()//扩展函数做成员函数时，类外无法访问
+//    ExtexndFunTwo().view()
+
+
 }
 
 fun inlinefun() {
 
     //使用容器（容器的运算函数几乎都是内联函数）
-    //    listOf<Int>(1, 2, 4, 6).forEach{
+//    listOf<Int>(1, 2, 4, 6).forEach {
 //        println("forEach|start")
-//        return@fe
 //        println("it is $it")
 //        println("forEach|end")
 //    }
@@ -58,10 +63,10 @@ fun inlinefun() {
 
 
     //例二
-    oneIF(1) {
-        return@oneIF
-        println("xxxxxx")
-    }
+//    oneIF(1) {
+//        return@oneIF
+//        println("xxxxxx")
+//    }
 
 
     //例三
@@ -84,6 +89,13 @@ fun inlinefun() {
 //    sixIF(1){
 //        println("it = ${it}")
 //    }
+
+
+    //例七
+//    reifiedFn<String>()
+
+
+
 }
 
 
@@ -179,9 +191,11 @@ inline fun oneIF(int: Int, fn: (Int) -> Unit) {
     println("oneIF|end")
 }
 
-fun twoIF(int: Int, fn: (Int) -> Unit) {
+fun twoIF(int: Int, fn: (Int) -> Unit):Any {
     println("int = ${int}")
     fn(int)
+    println(fn.hashCode())
+    return fn
 }
 
 inline fun threeIF(int: Int, noinline fn1: (Int) -> Unit, noinline fn2: (Int) -> Unit) {
@@ -217,4 +231,23 @@ fun <T : Any> sevenIF(kClass: KClass<T>) {
 inline fun <reified T> eightIF() {
     val ss: List<String> = listOf("one")
     println("ss is T = ${ss[0] is T}")
+}
+
+
+/**
+ * 扩展函数
+ */
+class ExtexndFunOne(val age:Int){
+    var name = "Tom"
+}
+class ExtexndFunTwo {
+    var name = "Jack"
+    fun ExtexndFunOne.see() {
+        println("${this.name} - ${this.age}")
+        println("${this@ExtexndFunTwo.name}")
+    }
+
+    fun view(){
+        ExtexndFunOne(96).see()
+    }
 }

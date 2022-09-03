@@ -1,6 +1,7 @@
 package syntax
 
 import kotlin.properties.Delegates
+import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -23,19 +24,24 @@ fun main() {
 //    readWrite = 9
 //    println("readWrite = ${readWrite}")
 
+//    println("readWriteProvider = ${readWriteProvider}")
+//    readWriteProvider = 9
+//    println("readWriteProvider = ${readWriteProvider}")
+
 
 
     /*---属性代理---*/
     //属性代理
-//    var mc:MyClass = MyClass(1, ClassWithDelegate(2))
-//    println("mc.delegatedToMember = ${mc.delegatedToMember}")
-//    println("mc.delegatedToTopLevel = ${mc.delegatedToTopLevel}")
-//    println("mc.delegatedToAnotherClass = ${mc.delegatedToAnotherClass}")
-//    println("MyClass.extDelegated = ${mc.extDelegated}, topLevelInt = ${topLevelInt}")
+    var mc:MyClass = MyClass(1, ClassWithDelegate(2))
+    println("mc.delegatedToMember = ${mc.delegatedToMember}")
+    println("mc.delegatedToTopLevel = ${mc.delegatedToTopLevel}")
+    println("mc.delegatedToAnotherClass = ${mc.delegatedToAnotherClass}")
+    println("mc.delegatedToDlg = ${mc.delegatedToDlg}")
+    println("MyClass.extDelegated = ${mc.extDelegated}, topLevelInt = ${topLevelInt}")
 
     //属性代理（重写provideDelegate运算符）
-    val i: Int by ResouceLoader()
-    println("i = ${i}")
+//    val i: Int by ResouceLoader()
+//    println("i = ${i}")
 //    var i: Int by ResouceLoader()
 //    println("i = ${i}")
 //    i = 33
@@ -133,6 +139,7 @@ var topLevelInt: Int = 0
 
 class ClassWithDelegate(val anotherClassInt: Int)
 class MyClass(var memberInt: Int, val anotherClassInstance: ClassWithDelegate) {
+    var delegatedToDlg: Int by MyDlg()
     var delegatedToMember: Int by this::memberInt
     var delegatedToTopLevel: Int by ::topLevelInt
 
@@ -180,6 +187,43 @@ var readWrite: Int by object : ReadWriteProperty<Any?, Int> {
     }
 }
 
+//方式一：使用匿名类
+var readWriteProvider: Int by object : PropertyDelegateProvider<Any?, ReadWriteProperty<Any?, Int>> {
+    override operator fun provideDelegate(
+        thisRef: Any?,
+        property: kotlin.reflect.KProperty<*>
+    ): ReadWriteProperty<Any?, Int> {
+        println("thisRef = [${thisRef}], property = [${property}]")
+        return object : ReadWriteProperty<Any?, Int> {
+            var int: Int = 0;
+            override fun getValue(thisRef: Any?, property: KProperty<*>): Int {
+                println("thisRef = [${thisRef}], property = [${property}]")
+                return int
+            }
+
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
+                println("thisRef = [${thisRef}], property = [${property}], value = [${value}]")
+                int = value
+            }
+        }
+    }
+}
+
+//方式二：使用Lambda表达式
+//var readWriteProvider: Int by PropertyDelegateProvider<Any?, ReadWriteProperty<Any?, Int>> { thisRef, property ->
+//    object : ReadWriteProperty<Any?, Int> {
+//        var int: Int = 0;
+//        override fun getValue(thisRef: Any?, property: KProperty<*>): Int {
+//            println("thisRef = [${thisRef}], property = [${property}]")
+//            return int
+//        }
+//
+//        override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
+//            println("thisRef = [${thisRef}], property = [${property}], value = [${value}]")
+//            int = value
+//        }
+//    }
+//}
 
 /*------重写操作符provideDelegate------*/
 //provideDelegate操作符返回ReadWriteProperty
@@ -206,20 +250,20 @@ var readWrite: Int by object : ReadWriteProperty<Any?, Int> {
 //}
 
 //provideDelegate操作符返回ReadWriteProperty
-class ResouceLoader{
-    operator fun provideDelegate(nothing: Nothing?, property: KProperty<*>): ReadOnlyProperty<Nothing?, Int> {
-        println("~~ResouceLoader.provideDelegate~~")
-        println("nothing = [${nothing}], property = [${property}]")
-        return object : ReadOnlyProperty<Nothing?, Int> {
-            override fun getValue(thisRef: Nothing?, property: KProperty<*>): Int {
-                println("~~ResouceLoader.getValue~~")
-                println("thisRef = [${thisRef}], property = [${property}]")
-                return 22
-            }
-        }
-
-    }
-}
+//class ResouceLoader{
+//    operator fun provideDelegate(nothing: Nothing?, property: KProperty<*>): ReadOnlyProperty<Nothing?, Int> {
+//        println("~~ResouceLoader.provideDelegate~~")
+//        println("nothing = [${nothing}], property = [${property}]")
+//        return object : ReadOnlyProperty<Nothing?, Int> {
+//            override fun getValue(thisRef: Nothing?, property: KProperty<*>): Int {
+//                println("~~ResouceLoader.getValue~~")
+//                println("thisRef = [${thisRef}], property = [${property}]")
+//                return 22
+//            }
+//        }
+//
+//    }
+//}
 
 //provideDelegate比ReadWriteProperty优先级高
 //class ResouceLoader: ReadWriteProperty<Any?, Int>{
@@ -257,3 +301,52 @@ class ResouceLoader{
 //        println("thisRef = [${thisRef}], property = [${property}], value = [${value}]")
 //    }
 //}
+
+//provideDelegate比ReadWriteProperty优先级高
+class ResouceLoader {
+    operator fun provideDelegate(nothing: Nothing?, property: KProperty<*>): ReadWriteProperty<Nothing?, Int> {
+        println("~~ResouceLoader.provideDelegate~~")
+        println("nothing = [${nothing}], property = [${property}]")
+        return object : ReadWriteProperty<Nothing?, Int> {
+            var k = 22
+            override fun getValue(thisRef: Nothing?, property: KProperty<*>): Int {
+                println("~~ReadWriteProperty.getValue~~")
+                println("thisRef = [${thisRef}], property = [${property}]")
+                return k
+            }
+
+            override fun setValue(thisRef: Nothing?, property: KProperty<*>, value: Int) {
+                println("~~ReadWriteProperty.setValue~~")
+                println("thisRef = [${thisRef}], property = [${property}], value = [${value}]")
+                k = value
+            }
+        }
+
+    }
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Int {
+        println("~~ResouceLoader.getValue1~~")
+        println("thisRef = [${thisRef}], property = [${property}]")
+        return 2
+    }
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
+        println("~~ResouceLoader.setValue~~")
+        println("thisRef = [${thisRef}], property = [${property}], value = [${value}]")
+    }
+}
+
+
+
+class MyDlg {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Int {
+        println("~~MyDlg.getValue~~")
+        println("thisRef = [${thisRef}], property = [${property}]")
+        return 2
+    }
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
+        println("~~MyDlg.setValue~~")
+        println("thisRef = [${thisRef}], property = [${property}], value = [${value}]")
+    }
+}

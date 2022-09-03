@@ -3,7 +3,7 @@ package syntax.clazz
 /**
  * Created by Administrator on 2021/8/5.
  */
-object StaticClass{
+object SingletonClass{
     val i:Int = 1
     fun show(){
         println("~~show~~")
@@ -11,15 +11,15 @@ object StaticClass{
 }
 
 fun main() {
-    val sc = StaticClass
+    val sc = SingletonClass
     println("sc.i is ${sc.i}")
     sc.show()
 
-    getSc(StaticClass)
+    getSc(SingletonClass)
 }
 
 
-fun getSc(sc:StaticClass):StaticClass{
+fun getSc(sc:SingletonClass):SingletonClass{
     println("sc = [${sc}]")
     return sc
 }

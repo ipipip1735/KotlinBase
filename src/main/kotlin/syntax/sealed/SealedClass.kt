@@ -53,7 +53,8 @@ fun main() {
     val k = when(val tsc:TheSealedClass = OneTSC()){
         STSC -> println("STSC")
         is OneTSC -> println("OneSC")
-        is TwoTSC -> println("TwoTSC")
+        else -> println("OneSC")
+//        is TwoTSC -> println("TwoTSC")
     }
     println("k = ${k}")
 

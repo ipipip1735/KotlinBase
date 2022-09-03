@@ -3,36 +3,32 @@ package async
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.selects.SelectClause1
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.AbstractCoroutine as AbstractCoroutine
 
 /**
  * Created by Administrator on 2021/8/19.
  */
 /**
- * 使用会合通道
+ * 使用回合通道
  */
 //fun main() {
 //    val channel = Channel<Int>(Channel.RENDEZVOUS)
 //    //方式一
-////    runBlocking {
-////        launch {
-////            val r = channel.receive()
-////            println("r = ${r}")
-////        }
-////        channel.send(1)
-////    }
-//
-//    //方式二
 //    runBlocking {
 //        launch {
-//            channel.send(1)
+//            val r = channel.receive()
+//            println("r = ${r}")
 //        }
-//        val r = channel.receive()
-//        println("r = ${r}")
+//        channel.send(1)
 //    }
+//
+//    //方式二
+////    runBlocking {
+////        launch {
+////            channel.send(1)
+////        }
+////        val r = channel.receive()
+////        println("r = ${r}")
+////    }
 //}
 
 
@@ -77,8 +73,21 @@ import kotlinx.coroutines.AbstractCoroutine as AbstractCoroutine
 /**
  * 遍历通道
  */
-fun main() = runBlocking {
-    //方式一
+//fun main() = runBlocking {
+//    //方式一
+////    val channel = Channel<Int>()
+////    launch {
+////        for (i in 1..2) {
+////            channel.send(i)
+////        }
+////        channel.close()
+////    }
+////    while (!channel.isClosedForReceive) {
+////        println("channel.receive() = ${channel.receive()}")
+////        yield()
+////    }
+//
+//    //方式二
 //    val channel = Channel<Int>()
 //    launch {
 //        for (i in 1..2) {
@@ -86,76 +95,63 @@ fun main() = runBlocking {
 //        }
 //        channel.close()
 //    }
-//    while (!channel.isClosedForReceive) {
-//        println("channel.receive() = ${channel.receive()}")
-//        yield()
+//
+//    while (true) {
+//        val v = channel.receiveCatching()
+//        println("channel.receiveCatching() = $v")
+//        println("exceptionOrNull = ${v.exceptionOrNull()}")
+//        if (v.getOrNull() == null) break
 //    }
-
-    //方式二
-    val channel = Channel<Int>()
-    launch {
-        for (i in 1..2) {
-            channel.send(i)
-        }
-        channel.close()
-    }
-
-    while (true) {
-        val v = channel.receiveCatching()
-        println("channel.receiveCatching() = $v")
-        println("exceptionOrNull = ${v.exceptionOrNull()}")
-        if (v.getOrNull() == null) break
-    }
-
-
-    //方式三
-//    val channel = Channel<Int>()
-//    launch {
-//        while (!channel.isClosedForReceive) {
-//            println("1channel.receive() = ${channel.receive()}")
-//            yield()
-//        }
-//    }
-//    for (i in 1..3) channel.send(i)
-//    val k = channel.close()
-
-
-    //方式四
-//    val channel = Channel<Int>()
-//    println("start")
-//    launch {
-//        for (i in 1..2) {
-//            channel.send(i)
-//        }
-//        channel.close()
-//    }
-//    launch {
-//        while (!channel.isClosedForReceive) {
-//            println("channel.receive() = ${channel.receive()}")
-//        }
-//    }
-//    println("end")
-
-
-    //方式五：使用customeEach()
-//    val channel = Channel<Int>()
-//    launch {
-//        repeat(3) { channel.send(it) }
-//        channel.close()
-//    }
-//    channel.consumeEach { println("$it|${channel.isClosedForReceive}") }
-
-
-    //方式六：自动取消
-//    val channel = Channel<Int>()
-//    launch {
-//        repeat(3) { channel.send(it) }
-//    }
-//    channel.consume {
-//        println("receive() = ${receive()}|isClosedForReceive = $isClosedForReceive")
-//    }
-//    println("receive() = ${channel.receive()}|${channel.isClosedForReceive}")
-}
+//
+//
+//    //方式三
+////    val channel = Channel<Int>()
+////    launch {
+////        while (!channel.isClosedForReceive) {
+////            println("1channel.receive() = ${channel.receive()}")
+////            yield()
+////        }
+////    }
+////    for (i in 1..3) channel.send(i)
+////    val k = channel.close()
+//
+//
+//    //方式四
+////    val channel = Channel<Int>()
+////    println("start")
+////    launch {
+////        for (i in 1..2) {
+////            channel.send(i)
+////        }
+////        channel.close()
+////    }
+////    launch {
+////        while (!channel.isClosedForReceive) {
+////            println("channel.receive() = ${channel.receive()}")
+////        }
+////    }
+////    println("end")
+//
+//
+//    //方式五：使用customeEach()
+////    val channel = Channel<Int>()
+////    launch {
+////        repeat(3) { channel.send(it) }
+////        channel.close()
+////    }
+////    channel.consumeEach { println("$it|${channel.isClosedForReceive}") }
+//
+//
+//    //方式六：自动取消
+////    val channel = Channel<Int>()
+////    launch {
+////        repeat(3) { channel.send(it) }
+////    }
+////    channel.consume {
+////        println("receive() = ${receive()}|isClosedForReceive = $isClosedForReceive")
+////    }
+////    println("receive() = ${channel.receive()}|${channel.isClosedForReceive}")
+//}
 
 
 /**
@@ -244,12 +240,27 @@ fun main() = runBlocking {
 /**
  * 生产者
  */
+fun main() = runBlocking {
+    val produce = produce<Int>(capacity = 3) {
+        repeat(15) {
+            println("${it}|b")
+            send(it)
+            println("${it}|e")
+        }
+    }
+    yield()
+    produce.consumeEach {
+        println("${it}|produce.isEmpty = ${produce.isEmpty}, produce.isClosedForReceive = ${produce.isClosedForReceive}")
+    }
+    yield()
+    println("produce.isEmpty = ${produce.isEmpty}, produce.isClosedForReceive = ${produce.isClosedForReceive}")
+}
+
 //fun main() = runBlocking {
 //
 //    val receiveChannel = produce {
 //        println("start")
-//        for (i in 1..5)
-//        send(1)
+//        for (i in 1..5) send(1)
 //        println("end")
 //    }
 //
@@ -313,13 +324,13 @@ fun main() = runBlocking {
 //        println("this = ${this}")
 //
 //        for (i in 1..3) {
-//            println("yiled|start")
+//            println("yield|start")
 //            yield(i)
 ////            val start = System.currentTimeMillis()
 ////            while (true) {
 ////                if (System.currentTimeMillis() - start > 1000L) break
 ////            }
-//            println("yiled|end")
+//            println("yield|end")
 //        }
 //    }
 //
@@ -356,7 +367,6 @@ fun main() = runBlocking {
 //    println("end")
 //
 //}
-
 
 /**
  * 扇入

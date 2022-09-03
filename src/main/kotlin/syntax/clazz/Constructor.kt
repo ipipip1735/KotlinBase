@@ -10,8 +10,8 @@ fun main() {
 //    println("oc = ${oc}")
 
 
-    var aa: AA = AA(2)
-    println("aa = ${aa}")
+//    var aa: AA = AA(2)
+//    println("aa = ${aa}")
 //
 //    var bb: AA = AA("one", 2)
 //    println("bb = ${bb}")
@@ -37,6 +37,7 @@ fun main() {
 //    dd.i = 99
 //    println("dd.i = ${dd.i}")
 
+    EE.aa()
 
 //    var ff:FF = FF()
 //    ff.d()
@@ -106,7 +107,7 @@ class DD() {
         }
 }
 
-class EE() {
+class EE {
     companion object {
         const val INT = 1
         fun aa() = INT

@@ -1,6 +1,7 @@
 package syntax
 
 import kotlin.reflect.KFunction
+import kotlin.reflect.KProperty
 
 /**
  * Created by Administrator on 2021/6/23.
@@ -12,10 +13,13 @@ fun main() {
 
 fun reference() {
 
-    //引用成员属性的getter
-//    val gl: (String) -> Int = String::length
-//    val length = gl("xxxx")
-//    println("length = ${length}")
+
+    val p:KProperty<Int> = String::length //获取反射对象
+    println("p is KProperty<Int> = ${p is KProperty<Int>}, p.isConst = ${p.isConst}")
+
+    val gl: (String) -> Int = String::length //引用成员属性的Getter
+    val length = gl("xxxx")
+    println("length = ${length}")
 
 
     //引用构造函数
@@ -26,8 +30,8 @@ fun reference() {
 //    println("(fc is KFunction<*>) is ${fc is KFunction<*>}")
 
     //引用成员函数
-    val oneR: OneR = OneR()
-    println("oneR::fn is KFunction<Unit> = ${oneR::fn is KFunction<Unit>}")
+//    val oneR: OneR = OneR()
+//    println("oneR::fn is KFunction<Unit> = ${oneR::fn is KFunction<Unit>}")
 }
 
 fun reflect() {

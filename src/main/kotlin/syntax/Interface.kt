@@ -20,15 +20,26 @@ fun main() {
 //    var two:TwoI = TwoI{99}
 
     //使用默认函数
-    var threeI: ThreeI = object : ThreeI{
-        override fun sum(): Int {
-            println("~~sum()~~")
-            return 1;
-        }
-    }
-    threeI.add()
-    threeI.sum()
+//    var threeI: ThreeI = object : ThreeI{
+//        override fun sum(): Int {
+//            println("~~sum()~~")
+//            return 1;
+//        }
+//    }
+//    threeI.add()
+//    threeI.sum()
 
+    //使用默认函数
+    val four:FourI = object: FourI{
+        override val onReceive: FiveI = object : FiveI {
+            override fun sum(k: () -> Unit) {
+                TODO("Not yet implemented")
+            }
+        }
+
+    }
+
+    four.onReceive.sum{}
 }
 
 interface OneI {
@@ -48,4 +59,11 @@ interface ThreeI {
     fun add(){
         println("~~add()~~")
     }
+}
+
+interface FourI {
+    public abstract val onReceive:FiveI
+}
+fun interface FiveI {
+    fun sum(k:()->Unit):Unit
 }

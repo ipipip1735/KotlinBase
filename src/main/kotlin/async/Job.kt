@@ -202,25 +202,33 @@ import kotlin.system.measureTimeMillis
 /**
  * 取消检查
  */
-//fun main() {
-//    //方式一
-////    runBlocking(Dispatchers.Default) {
-////        println("start|${System.currentTimeMillis()}|$this")
-////
-////        val job = launch {
-////            println("job|start|${System.currentTimeMillis()}|$this")
-////            val start = System.currentTimeMillis()
-////            while (isActive) {
-////                if (System.currentTimeMillis() - start > 3000L) break
-////            }
-////            println("job|end|${System.currentTimeMillis()}|$this")
-////        }
-////
-////        job.cancel()
-////        println("end|${System.currentTimeMillis()}|$this")
-////    }
-//
-//    //方式二
+fun main() {
+    //方式一
+    runBlocking(Dispatchers.Default) {
+        println("start|${System.currentTimeMillis()}|$this")
+
+        val job = launch {
+            println("job1|start|${Thread.currentThread()}|${System.currentTimeMillis()}|$this")
+            while (true) {
+                if (!isActive) break
+            }
+            println("job1|end|${System.currentTimeMillis()}|$this")
+        }
+
+        launch {
+            println("job2|start|${Thread.currentThread()}|$this")
+            val start = System.currentTimeMillis()
+            while (true) {
+                if (System.currentTimeMillis() - start > 3000L) break
+            }
+//            job.cancel()
+            println("job2|end|$this")
+        }
+        coroutineContext.cancelChildren()//父任务取消，将取消所有子任务（job1和job2都会取消）
+        println("end|${System.currentTimeMillis()}|$this")
+    }
+
+    //方式二
 //    runBlocking{
 //        println("start|${System.currentTimeMillis()}|$this")
 //
@@ -238,7 +246,7 @@ import kotlin.system.measureTimeMillis
 //        job.cancel()
 //        println("end|${System.currentTimeMillis()}|$this")
 //    }
-//}
+}
 
 
 
@@ -292,30 +300,30 @@ import kotlin.system.measureTimeMillis
 /**
  * 监控任务
  */
-fun main() = runBlocking {
-    val supervisor = SupervisorJob()
-    with(CoroutineScope(coroutineContext + supervisor)) {
-        // launch the first child -- its exception is ignored for this example (don't do this in practice!)
-        val firstChild = launch(CoroutineExceptionHandler { _, _ ->  }) {
-            println("The first child is failing")
-            throw AssertionError("The first child is cancelled")
-        }
-        // launch the second child
-        val secondChild = launch {
-            firstChild.join()
-            // Cancellation of the first child is not propagated to the second child
-            println("The first child is cancelled: ${firstChild.isCancelled}, but the second one is still active")
-            try {
-                delay(Long.MAX_VALUE)
-            } finally {
-                // But cancellation of the supervisor is propagated
-                println("The second child is cancelled because the supervisor was cancelled")
-            }
-        }
-        // wait until the first child fails & completes
-        firstChild.join()
-        println("Cancelling the supervisor")
-        supervisor.cancel()
-        secondChild.join()
-    }
-}
+//fun main() = runBlocking {
+//    val supervisor = SupervisorJob()
+//    with(CoroutineScope(coroutineContext + supervisor)) {
+//        // launch the first child -- its exception is ignored for this example (don't do this in practice!)
+//        val firstChild = launch(CoroutineExceptionHandler { _, _ ->  }) {
+//            println("The first child is failing")
+//            throw AssertionError("The first child is cancelled")
+//        }
+//        // launch the second child
+//        val secondChild = launch {
+//            firstChild.join()
+//            // Cancellation of the first child is not propagated to the second child
+//            println("The first child is cancelled: ${firstChild.isCancelled}, but the second one is still active")
+//            try {
+//                delay(Long.MAX_VALUE)
+//            } finally {
+//                // But cancellation of the supervisor is propagated
+//                println("The second child is cancelled because the supervisor was cancelled")
+//            }
+//        }
+//        // wait until the first child fails & completes
+//        firstChild.join()
+//        println("Cancelling the supervisor")
+//        supervisor.cancel()
+//        secondChild.join()
+//    }
+//}

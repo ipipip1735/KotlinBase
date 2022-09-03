@@ -20,4 +20,13 @@ fun main() {
 //    for (key in map.keys) {
 //        println("map[$key] = ${map[key]}")
 //    }
+
+//    for (value in map.values) {
+//        println("value = $value")
+//    }
+
+    map.mapValues {
+        println("it = ${it}")
+    }
+
 }

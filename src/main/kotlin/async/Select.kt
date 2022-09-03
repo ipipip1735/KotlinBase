@@ -1,20 +1,129 @@
 package async
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.selects.selectUnbiased
-import kotlin.concurrent.thread
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.reflect.jvm.internal.impl.resolve.constants.KClassValue
-import kotlin.system.measureTimeMillis
 
 /**
  * Created by Administrator on 2021/8/23.
  */
+/**
+ * 使用选择器
+ */
+fun main() = runBlocking {
+
+    val p = produce<Int> {
+//    val p = produce<Int>(capacity = 3) {
+        repeat(6) {
+            println("$it|b")
+            send(it)
+            println("$it|e")
+        }
+    }
+
+    println("start")
+    repeat(10) {
+        if (p.isClosedForReceive)return@repeat
+        select<Unit> {
+            println("p|it = ${it}, p.isClosedForReceive = ${p.isClosedForReceive}, ${java.lang.Thread.currentThread()}")
+            p.onReceive {
+                println("p|it = ${it}, p.isEmpty = ${p.isEmpty}, ${java.lang.Thread.currentThread()}")
+            }
+        }
+        yield()
+    }
+
+    println("stop|p.isClosedForReceive = ${p.isClosedForReceive}")
+}
+
+//fun main() = runBlocking {
+//
+//    val p0 = produce<Int> {
+//        repeat(2) {
+//            println("$it|b")
+//            send(it)
+//            println("$it|e")
+//        }
+//    }
+//    val p1 = produce<Int> {
+//        repeat(5) {
+//            send(it)
+//        }
+//    }
+//    val p2 = produce<Int> {
+//        repeat(5) {
+//            send(it)
+//        }
+//    }
+//
+//
+//
+//    println("start")
+//    //方式一：使用while
+//    while (!p0.isClosedForReceive || !p1.isClosedForReceive || !p2.isClosedForReceive) {
+//        select<Unit> {
+//            println("p0.isClosedForReceive = ${p0.isClosedForReceive}")
+//
+//            if (!p0.isClosedForReceive) {
+//                p0.onReceive {
+//                    println("p0|it = ${it}, p0.isEmpty = ${p0.isEmpty}, p0.isClosedForReceive = ${p0.isClosedForReceive}")
+//                }
+//            }
+//
+//            if (!p1.isClosedForReceive) {
+//                p1.onReceive {
+//                    println("p1|it = ${it}")
+//                }
+//            }
+//
+//            if (!p2.isClosedForReceive) {
+//                p2.onReceive {
+//                    println("p2|it = ${it}")
+//                }
+//            }
+//
+//        }
+//        yield()
+//        println("yield")
+//    }
+//
+//    //方式二：使用repeat
+////    repeat(23) {
+////        select<Unit> {
+////            println("p0.isClosedForReceive = ${p0.isClosedForReceive}")
+////            if (!p0.isClosedForReceive) {
+////                p0.onReceive {
+////                    println("p0|it = ${it}, p0.isEmpty = ${p0.isEmpty}, p0.isClosedForReceive = ${p0.isClosedForReceive}")
+////                }
+////            }
+////
+////            if (!p1.isClosedForReceive) {
+////                p1.onReceive {
+////                    println("p1|it = ${it}")
+////                }
+////            }
+////
+////            if (!p2.isClosedForReceive) {
+////                p2.onReceive {
+////                    println("p2|it = ${it}")
+////                }
+////            }
+////
+////        }
+////        yield()
+////    }
+//
+////    select<Unit> {
+////
+////        println("p0.isClosedForReceive = ${p0.isClosedForReceive}")
+//////        p0.onReceive {
+//////            println("p0|it = ${it}, p0.isEmpty = ${p0.isEmpty}, p0.isClosedForReceive = ${p0.isClosedForReceive}")
+//////        }
+////    }
+//    println("stop")
+//}
+
+
 /**
  * 使用onReceive
  */
@@ -37,11 +146,11 @@ import kotlin.system.measureTimeMillis
 //        }
 //    }
 //
-//    repeat(9) {
+//    repeat(1) {
 //        println("------------$it|start")
 //        //创建选择器
-////        select<Unit> { /*优先选择第一个分句，其他分句只有在第一个分句无法执行时才会执行*/
-//        selectUnbiased<Unit> { /*公平选择器，完全随机选择*/
+//        select<Unit> { /*优先选择第一个分句，其他分句只有在第一个分句无法执行时才会执行*/
+////        selectUnbiased<Unit> { /*公平选择器，完全随机选择*/
 //            println("repeat$it|1")
 //            p1.onReceive { v ->
 //                val start = System.currentTimeMillis()
@@ -201,40 +310,40 @@ import kotlin.system.measureTimeMillis
 /**
  * 使用onSend
  */
-fun main() = runBlocking {
-    println("start")
-
-    val channel = Channel<Deferred<String>>()
-    launch {
-        println("launch|start")
-        var current = channel.receive()
-
-        while (isActive) {
-            val r = select<Deferred<String>?> {
-                current.onAwait {
-                    println("onAwait|$it")
-                    channel.receive()
-                }
-                channel.onReceiveCatching {
-                    println("onReceiveCatching|$it")
-                    it.getOrNull()
-                }
-
-            }
-            println("r = ${r}")
-            if (r == null) break else current = r
-        }
-        println("launch|end")
-    }
-
-    repeat(4) {
-        channel.send(async {
-//            delay(if(it == 2)100L else 6000L)
-            "$it - deferred"
-        }
-        )
-    }
-    channel.close()
-
-    println("end")
-}
+//fun main() = runBlocking {
+//    println("start")
+//
+//    val channel = Channel<Deferred<String>>()
+//    launch {
+//        println("launch|start")
+//        var current = channel.receive()
+//
+//        while (isActive) {
+//            val r = select<Deferred<String>?> {
+//                current.onAwait {
+//                    println("onAwait|$it")
+//                    channel.receive()
+//                }
+//                channel.onReceiveCatching {
+//                    println("onReceiveCatching|$it")
+//                    it.getOrNull()
+//                }
+//
+//            }
+//            println("r = ${r}")
+//            if (r == null) break else current = r
+//        }
+//        println("launch|end")
+//    }
+//
+//    repeat(4) {
+//        channel.send(async {
+////            delay(if(it == 2)100L else 6000L)
+//            "$it - deferred"
+//        }
+//        )
+//    }
+//    channel.close()
+//
+//    println("end")
+//}

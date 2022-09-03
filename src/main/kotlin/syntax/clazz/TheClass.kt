@@ -1,6 +1,7 @@
 package syntax.clazz
 
-import syntax.clazz.CompanionClass.A.show
+import async.OneKey
+import syntax.clazz.ACompanionClass.A.show
 
 /**
  * Created by Administrator on 2021/6/13.
@@ -10,16 +11,21 @@ fun main() {
     //内部类
 //    inner()
 
+    //内嵌类
+//    nested()
+
 
     //匿名类
 //    anonymousOne()
 
-    //静态类
-//    staticOne()
+    //静态单例
+//    singleton()
 
     //伴随对象
-//    CompanionClass.one()
+//    ACompanionClass.one()
 //    CCO().show()//调用伴随对象中定义的扩展函数
+//    val cli:CLI = BCompanionClass
+//    cli.see()
 
 
     //扩展函数
@@ -45,9 +51,9 @@ fun main() {
 //    twoInherit.show()
 
     //内联类
-    val oneIC: OneIC = OneIC("abcdefg")
-    println("oneIC.s = ${oneIC.s}, oneIC.size = ${oneIC.size}")
-    show(oneIC)
+//    val oneIC: OneIC = OneIC("abcdefg")
+//    println("oneIC.s = ${oneIC.s}, oneIC.size = ${oneIC.size}")
+//    show(oneIC)
 
 
     //内联类VS类型别名
@@ -63,6 +69,12 @@ fun main() {
 ////    acceptNameInlineClass(string) // Not OK: can't pass underlying type instead of inline class
 }
 
+fun nested() {
+    val nested: Outer.Nested = Outer.Nested()
+    println("nested = ${nested}")
+
+}
+
 fun inner() {
     val outer: Outer = Outer()
     val inner: Outer.Inner = Outer().Inner()
@@ -71,12 +83,12 @@ fun inner() {
 
 }
 
-private fun staticOne() {
+private fun singleton() {
 
-    //静态类属性
+    //静态单例属性
     println(S.k)
 
-    //静态类实现接口
+    //静态单例实现接口
 //    println(SI.k)
 //    SI.show()
 
@@ -94,8 +106,11 @@ private fun anonymousOne() {
     println("helloWorld = ${helloWorld}")
 }
 
+interface CLI{
+    fun see()
+}
 
-class CompanionClass {
+class ACompanionClass {
     companion object A {
         fun one() {
             println("one")
@@ -106,6 +121,16 @@ class CompanionClass {
         fun CCO.show() {
             println(this)
         }
+    }
+}
+
+class BCompanionClass {
+    val i = 3
+    companion object : CLI {
+        override fun see() {
+            println("~~show~~")
+        }
+
     }
 }
 
@@ -167,6 +192,8 @@ class TwoInherit : OneInherit() {
 class Outer {
     inner class Inner {
     }
+
+    class Nested{}
 }
 
 
@@ -239,12 +266,12 @@ interface AAI {
     fun show()
 }
 
-//声明静态类S
+//声明静态单例S
 object S {
     val k = 1
 }
 
-//声明静态类SI，它实现了AAI接口
+//声明静态单例SI，它实现了AAI接口
 object SI : AAI {
     val k = 1
     override fun show() {
